@@ -4,4 +4,3 @@ metadata:
   name: mssql-persistent
   labels:
     app: mssql
-    argocd.argoproj.io/managed-by: openshift-gitops
