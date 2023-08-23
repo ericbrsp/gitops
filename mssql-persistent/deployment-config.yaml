@@ -1,0 +1,52 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: mssql-deployment
+  namespace: mssql-persistent
+  labels:
+    e2e-app: "true"
+    app: mssql
+spec:
+  replicas: 1
+  selector:
+    name: mssql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        e2e-app: "true"
+        name: mssql
+        app: mssql
+    spec:
+      serviceAccountName: mssql-persistent-sa
+      containers:
+      - env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: mssql-password
+              name: mssql-secret
+        image: quay.io/ocpmigrate/mssql-server:latest
+        imagePullPolicy: Always
+        name: mssql
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: 1433
+        resources:
+          limits:
+            memory: "3Gi"
+            cpu: "0.5"
+          requests:
+             memory: "3Gi"
+             cpu: "0.5"
+        volumeMounts:
+          - mountPath: "/var/opt/mssql/data"
+            name: mssql-vol
+      volumes:
+      - name: mssql-vol
+        persistentVolumeClaim:
+          claimName: mssql-pvc

@@ -1,0 +1,10 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: mssql-app-route
+  namespace: mssql-persistent
+spec:
+  path: "/"
+  to:
+    kind: Service
+    name: mssql-app-service

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mssql-app-deployment
+  namespace: mssql-persistent
+  labels:
+    e2e-app: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mssql-app
+  template:
+    metadata:
+      labels:
+        e2e-app: "true"
+        app: mssql-app
+    spec:
+      terminationGracePeriodSeconds: 10
+      serviceAccountName: mssql-persistent-sa
+      containers:
+      - name: mssql-app
+        image: quay.io/ocpmigrate/mssql-sample-app:microsoft
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        securityContext:
+          privileged: true
+        env:
+        - name: ConnString
+          value: "Server=mssql-service.mssql-persistent.svc.cluster.local;Database=ProductCatalog;User ID=WebLogin; password=SQLPass1234!"
